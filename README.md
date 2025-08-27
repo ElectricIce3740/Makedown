@@ -1,6 +1,5 @@
-<p align="center">
-  <img src="/public/favicon.svg" alt="Logo" width="100">
-</p>
+<img src="/public/favicon.svg" alt="Logo" width="100">
+
 
 # Makedown
 
