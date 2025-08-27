@@ -17,6 +17,7 @@
 // -----------------------------------------------------------------
 const fs = require('fs').promises;
 const path = require('path');
+const { title, config } = require('process');
 const showdown = require('showdown');
 
 // -----------------------------------------------------------------
@@ -264,7 +265,7 @@ async function getBlogPosts() {
  * @param {string} pagesTemplate - The template for individual blog pages.
  * @returns {Promise<object|null>} A promise that resolves to the built post data, or null on error.
  */
-async function buildBlogPage(post, pagesTemplate) {
+async function buildBlogPage(post, pagesTemplate, config) {
   try {
     const contentPath = path.join(paths.blogs, post.dir, 'content.md');
     const blogContent = await fs.readFile(contentPath, 'utf-8');
@@ -275,7 +276,8 @@ async function buildBlogPage(post, pagesTemplate) {
             content: blogHtml,
             meta: post.meta,
             url: post.dir
-        }
+        },
+        title: config.title
     };
     const finalHtml = fillTemplate(pagesTemplate, pageData);
 
@@ -306,7 +308,8 @@ async function buildBlogPage(post, pagesTemplate) {
  */
 async function main() {
   try {
-    // 1. Setup: Ensure the public directory exists and copy static files.
+    // 1. Setup: Clear the public directory, ensure it exists, and copy static files.
+    await fs.rm(paths.public, { recursive: true, force: true });
     await ensureDirectoryExists(paths.public);
     await copyStaticFiles(paths.static, paths.public);
 
@@ -346,13 +349,13 @@ async function main() {
     const blogPostsMeta = await getBlogPosts();
 
     // 5. Build Pages: Build each individual blog page.
-    const builtPosts = (await Promise.all(blogPostsMeta.map(post => buildBlogPage(post, pagesTemplate)))).filter(p => p);
+    const builtPosts = (await Promise.all(blogPostsMeta.map(post => buildBlogPage(post, pagesTemplate, config)))).filter(p => p);
 
     // 6. Build Index: Build the main index page with a list of all posts.
     const blogContent = {
         posts: builtPosts
     };
-    const indexHtml = fillTemplate(mainTemplate, { config: config, blogcontent: blogContent });
+    const indexHtml = fillTemplate(mainTemplate, { title: config.title, blogcontent: blogContent });
     const indexPath = path.join(paths.public, 'index.html');
     await fs.writeFile(indexPath, indexHtml);
     console.log('Successfully built index.html');
