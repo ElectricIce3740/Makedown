@@ -46,9 +46,11 @@ I have only tried node.js v22, but others should work as well. The only other de
     npm run build
     ```
     This will generate your static site in the `public/` directory.
-6. **Preview**  run ```bash
+6. **Preview**  run
+    ```bash
     npm run start
-    ``` and visit [http://localhost:3000](http://localhost:3000) to preview your blog in action. See [Building and Deployment](#building-and-deployment) for more info.
+    ```
+    and visit [http://localhost:3000](http://localhost:3000) to preview your blog in action. See [Building and Deployment](#building-and-deployment) for more info.
 7.  **Deploy:** Host the `public/` directory on any static hosting provider. See [Building and Deployment](#building-and-deployment) for more info.
 
 ## Configuration
