@@ -28,11 +28,11 @@ I have only tried node.js v22, but others should work as well. The only other de
 
 ## Getting Started
 
-1.  **Clone the repository:**
+1.  **Clone the repository:** In the parent folder where you want your project to be, run
     ```bash
-    git clone https://github.com/your-username/makedown
+    git clone https://github.com/ElectricIce3740/Makedownn
     ```
-2.  **Install dependencies:**
+2.  **Install dependencies:** Navigate to the created directory and run
     ```bash
     npm install
     ```
@@ -41,12 +41,12 @@ I have only tried node.js v22, but others should work as well. The only other de
     *   Write blog posts in the `src/blogs/` directory. See the [Blogging](#blogging) section.
     *   Add static files (CSS, images) to the `src/static/` directory. See the [Static Files](#static-files) section.
     *   (Optional) Customize the HTML templates in `src/templates/`. See the [Templates](#templates) section.
-5.  **Build your site:**
+5.  **Build your site:** Run:
     ```bash
     npm run build
     ```
     This will generate your static site in the `public/` directory.
-6. **Preview**  run
+6. **Preview**  Run:
     ```bash
     npm run start
     ```
@@ -162,7 +162,7 @@ While you can run the site in a Node.js environment, using a dedicated static ho
 
 ## Feedback 
 
-If you have any questions, comments, or suggestions, please [file a GitHub issue](https://github.com/directory/issues). I would love to hear from you!
+If you have any questions, comments, or suggestions, please [file a GitHub issue](https://github.com/ElectricIce3740/Makedown/issues). I would love to hear from you!
 
 ## License
 
