@@ -1,4 +1,4 @@
-# Makedown ![Makedown Logo](public/favicon.svg)
+# Makedown <img src="/public/favicon.svg" alt="Logo" width="30">
 
 **A Super Simple Blog Framework in Node.js**
 
