@@ -36,7 +36,7 @@ I have only tried node.js v22, but others should work as well. The only other de
     ```bash
     npm install
     ```
-3.  **Configure your blog:** Edit the `.makedown.config.json` file to set your site's title and template paths. See the [Configuration](#configuration) section for more details.
+3.  **Configure your blog:** Edit the `.makedown.config.json` file to set your site's title and (optionaly) template paths. See the [Configuration](#configuration) section for more details.
 4.  **Add your content:**
     *   Write blog posts in the `src/blogs/` directory. See the [Blogging](#blogging) section.
     *   Add static files (CSS, images) to the `src/static/` directory. See the [Static Files](#static-files) section.
@@ -46,14 +46,17 @@ I have only tried node.js v22, but others should work as well. The only other de
     npm run build
     ```
     This will generate your static site in the `public/` directory.
-6.  **Deploy:** Host the `public/` directory on any static hosting provider. See [Building and Deployment](#building-and-deployment) for more info.
+6. **Preview**  run ```bash
+    npm run start
+    ``` and visit [http://localhost:3000](http://localhost:3000) to preview your blog in action. See [Building and Deployment](#building-and-deployment) for more info.
+7.  **Deploy:** Host the `public/` directory on any static hosting provider. See [Building and Deployment](#building-and-deployment) for more info.
 
 ## Configuration
 
 The main configuration for your blog is in the `.makedown.config.json` file. Here are the available options:
 
 *   `title`: The main title of your website. This is available in your templates as `{{ title }}`.
-*   `templateRoutes`: An object that specifies which template files to use for different parts of your site.
+*   `templateRoutes`: An object that specifies which template files to use for different parts of your site. You shouldn't need to mess with this unless you are building your own modifications
     *   `main`: The template for your main `index.html` page (the page that lists all your blog posts).
     *   `pages`: The template for individual blog post pages.
 
@@ -73,7 +76,7 @@ And that's about it for now. Maybe I'll add more in the future.
 
 ## Templates
 
-The templating engine allows you to insert your blog data into HTML templates. Makedown uses a custom lightweight templating syntax. {{ ... }} is used for variable interpolation, and [[(... )]] is used for loops. This is not Mustache or Handlebars — it’s a minimal system built specifically for Makedown.
+The templating engine allows you to insert your blog data into HTML templates. Makedown uses a custom lightweight templating syntax. {{ ... }} is used for variable interpolation, and [[( ... ) ]] is used for loops. This is not Mustache or Handlebars — it’s a minimal system built specifically for Makedown.
 
 ### Placeholders
 
@@ -161,4 +164,4 @@ If you have any questions, comments, or suggestions, please [file a GitHub issue
 
 ## License
 
-The MIT License, so feel free to make your own version if you'd like!
+Makedown uses the MIT License, so feel free to make your own version if you'd like!
