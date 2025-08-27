@@ -1,6 +1,6 @@
 # Makedown
 
-![Makedown Logo](public/favicon.svg){ width=100 }
+![Makedown Logo](public/favicon.svg){ width=50 }
 
 **A Super Simple Blog Framework in Node.js**
 
