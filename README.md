@@ -7,6 +7,7 @@
 ## Table of Contents
 
 - [About](#about)
+- [Dependencies](#dependencies)
 - [Getting Started](#getting-started)
 - [Configuration](#configuration)
 - [Blogging](#blogging)
