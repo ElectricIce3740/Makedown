@@ -1,7 +1,8 @@
-<h1>
-  My Project
-  <img src="/public/favicon.svg" alt="Logo" width="80" style="vertical-align: middle; margin-left: 8px;">
-</h1>
+<p align="center">
+  <img src="/public/favicon.svg" alt="Logo" width="100">
+</p>
+
+# Makedown
 
 **A Super Simple Blog Framework in Node.js**
 
