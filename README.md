@@ -30,7 +30,7 @@ I have only tried node.js v22, but others should work as well. The only other de
 
 1.  **Clone the repository:** In the parent folder where you want your project to be, run
     ```bash
-    git clone https://github.com/ElectricIce3740/Makedownn
+    git clone https://github.com/ElectricIce3740/Makedown
     ```
 2.  **Install dependencies:** Navigate to the created directory and run
     ```bash
