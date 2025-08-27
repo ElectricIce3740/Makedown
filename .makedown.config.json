@@ -1,6 +1,6 @@
 {
-  "title": "this is the best title efver",
-  "routes": {
+  "title": "Makedown",
+  "templateRoutes": {
     "main": "main.html",
     "pages": "pages.html"
   }

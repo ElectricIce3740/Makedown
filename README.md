@@ -1,4 +1,4 @@
-# Blogdown
+# <img src="public/favicon.svg" alt="Makedown Logo" width="32" height="32"> Blogdown
 
 **A Super Simple Blog Framework in Node.js**
 
@@ -78,21 +78,21 @@ Simply upload the contents of the `public/` directory to your hosting provider.
 
 # Configuration
 
-The main configuration for your blog is in the `.blisss.config.json` file. Here are the available options:
+The main configuration for your blog is in the `.makedown.config.json` file. Here are the available options:
 
 *   `title`: The main title of your website. This is available in your templates as `{{ title }}`.
-*   `routes`: An object that specifies which template files to use for different parts of your site.
+*   `templateRoutes`: An object that specifies which template files to use for different parts of your site.
     *   `main`: The template for your main `index.html` page (the page that lists all your blog posts).
     *   `pages`: The template for individual blog post pages.
 
 And that's about it for now. Maybe I'll add more in the future.
 
-Example `.blisss.config.json`:
+Example `.makedown.config.json`:
 
 ```json
 {
   "title": "My Awesome Blog",
-  "routes": {
+  "templateRoutes": {
     "main": "main.html",
     "pages": "pages.html"
   }

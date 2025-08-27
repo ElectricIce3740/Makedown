@@ -37,7 +37,7 @@ const paths = {
   public: 'public',
   blogs: 'src/blogs',
   templates: 'src/templates',
-  config: '.blisss.config.json',
+  config: '.makedown.config.json',
   static: 'src/static'
 };
 
@@ -67,7 +67,7 @@ function resolvePath(pathString, data) {
 
   for (const key of keys) {
     if (currentValue === undefined || currentValue === null) {
-      throw new Error(`[Bliss] Cannot resolve path: '${pathString}'. Part of the path is undefined or null.`);
+      throw new Error(`[Makedown] Cannot resolve path: '${pathString}'. Part of the path is undefined or null.`);
     }
 
     const arrayMatch = key.match(/(\w+)\[(\d+)\]/);
@@ -77,12 +77,12 @@ function resolvePath(pathString, data) {
       if (currentValue[arrayName] && Array.isArray(currentValue[arrayName])) {
         currentValue = currentValue[arrayName][index];
       } else {
-        throw new Error(`[Bliss] Cannot resolve array part of path: '${key}' in '${pathString}'.`);
+        throw new Error(`[Makedown] Cannot resolve array part of path: '${key}' in '${pathString}'.`);
       }
     } else if (typeof currentValue === 'object' && key in currentValue) {
       currentValue = currentValue[key];
     } else {
-      throw new Error(`[Bliss] Key not found: '${key}' in '${pathString}'`);
+      throw new Error(`[Makedown] Key not found: '${key}' in '${pathString}'`);
     }
   }
   return currentValue;
@@ -104,7 +104,7 @@ function replacePlaceholders(template, data) {
     } catch (error) {
       // If a key is not found, log a warning and return the original placeholder.
       // This is useful for debugging templates without halting the build.
-      console.warn(`[Bliss] Template Warning: ${error.message}. The placeholder '${match}' will not be replaced.`);
+      console.warn(`[Makedown] Template Warning: ${error.message}. The placeholder '${match}' will not be replaced.`);
       return match;
     }
   });
@@ -124,7 +124,7 @@ function processLoops(template, data) {
   return template.replace(loopRegex, (match, arrayPath, loopTemplate) => {
     const array = resolvePath(arrayPath, data);
     if (!Array.isArray(array)) {
-      throw new Error(`[Bliss] Path '${arrayPath}' did not resolve to an array.`);
+      throw new Error(`[Makedown] Path '${arrayPath}' did not resolve to an array.`);
     }
 
     let result = '';
@@ -169,7 +169,7 @@ async function ensureDirectoryExists(dirPath) {
   try {
     await fs.mkdir(dirPath, { recursive: true });
   } catch (error) {
-    console.error(`[Bliss] Fatal: Could not create directory at '${dirPath}'. Please check permissions.`);
+    console.error(`[Makedown] Fatal: Could not create directory at '${dirPath}'. Please check permissions.`);
     throw error;
   }
 }
@@ -198,10 +198,10 @@ async function copyStaticFiles(sourceDir, destinationDir) {
   } catch (error) {
     // If the source directory doesn't exist, we can just return. This is not a fatal error.
     if (error.code === 'ENOENT') {
-      console.warn(`[Bliss] Info: Static assets directory not found at '${sourceDir}'. Skipping copy.`);
+      console.warn(`[Makedown] Info: Static assets directory not found at '${sourceDir}'. Skipping copy.`);
       return;
     }
-    console.error(`[Bliss] Fatal: Error copying static files from '${sourceDir}'.`, error);
+    console.error(`[Makedown] Fatal: Error copying static files from '${sourceDir}'.`, error);
     throw error;
   }
 }
@@ -229,11 +229,11 @@ async function getBlogPosts() {
             };
           } catch (error) {
             if (error.code === 'ENOENT') {
-                console.error(`[Bliss] Error: Missing 'meta.json' for post '${dirent.name}'. Skipping.`);
+                console.error(`[Makedown] Error: Missing 'meta.json' for post '${dirent.name}'. Skipping.`);
             } else if (error instanceof SyntaxError) {
-                console.error(`[Bliss] Error: Invalid JSON in 'meta.json' for post '${dirent.name}'. Skipping. Details: ${error.message}`);
+                console.error(`[Makedown] Error: Invalid JSON in 'meta.json' for post '${dirent.name}'. Skipping. Details: ${error.message}`);
             } else {
-                console.error(`[Bliss] Error: Could not read metadata for post '${dirent.name}'. Skipping.`, error);
+                console.error(`[Makedown] Error: Could not read metadata for post '${dirent.name}'. Skipping.`, error);
             }
             return null;
           }
@@ -242,9 +242,9 @@ async function getBlogPosts() {
     return posts.filter(post => post !== null);
   } catch (error) {
     if (error.code === 'ENOENT') {
-        console.error(`[Bliss] Fatal: The blogs directory was not found at '${paths.blogs}'.`);
+        console.error(`[Makedown] Fatal: The blogs directory was not found at '${paths.blogs}'.`);
     } else {
-        console.error(`[Bliss] Fatal: Could not read blogs directory at '${paths.blogs}'.`, error);
+        console.error(`[Makedown] Fatal: Could not read blogs directory at '${paths.blogs}'.`, error);
     }
     throw error;
   }
@@ -295,9 +295,9 @@ async function buildBlogPage(post, pagesTemplate, config) {
     };
   } catch (error) {
     if (error.code === 'ENOENT') {
-        console.error(`[Bliss] Error: Missing 'content.md' for post '${post.dir}'. Skipping page generation.`);
+        console.error(`[Makedown] Error: Missing 'content.md' for post '${post.dir}'. Skipping page generation.`);
     } else {
-        console.error(`[Bliss] Error: Failed to build page for post '${post.dir}'. Skipping.`, error);
+        console.error(`[Makedown] Error: Failed to build page for post '${post.dir}'. Skipping.`, error);
     }
     return null;
   }
@@ -320,11 +320,11 @@ async function main() {
         config = JSON.parse(configContent);
     } catch (error) {
         if (error.code === 'ENOENT') {
-            console.error(`[Bliss] Fatal: Configuration file not found at '${paths.config}'.`);
+            console.error(`[Makedown] Fatal: Configuration file not found at '${paths.config}'.`);
         } else if (error instanceof SyntaxError) {
-            console.error(`[Bliss] Fatal: Invalid JSON in configuration file '${paths.config}'.`);
+            console.error(`[Makedown] Fatal: Invalid JSON in configuration file '${paths.config}'.`);
         } else {
-            console.error(`[Bliss] Fatal: Could not read configuration file at '${paths.config}'.`, error);
+            console.error(`[Makedown] Fatal: Could not read configuration file at '${paths.config}'.`, error);
         }
         throw error;
     }
@@ -332,15 +332,15 @@ async function main() {
     // 3. Templates: Load the main and page templates.
     let mainTemplate, pagesTemplate;
     try {
-        const mainTemplatePath = path.join(paths.templates, config.routes.main);
+        const mainTemplatePath = path.join(paths.templates, config.templateRoutes.main);
         mainTemplate = await fs.readFile(mainTemplatePath, 'utf-8');
-        const pagesTemplatePath = path.join(paths.templates, config.routes.pages);
+        const pagesTemplatePath = path.join(paths.templates, config.templateRoutes.pages);
         pagesTemplate = await fs.readFile(pagesTemplatePath, 'utf-8');
     } catch (error) {
         if (error.code === 'ENOENT') {
-            console.error(`[Bliss] Fatal: A template file was not found. Please check your config routes and template files. Path: ${error.path}`);
+            console.error(`[Makedown] Fatal: A template file was not found. Please check your config templateRoutes and template files. Path: ${error.path}`);
         } else {
-            console.error(`[Bliss] Fatal: Could not read template files.`, error);
+            console.error(`[Makedown] Fatal: Could not read template files.`, error);
         }
         throw error;
     }
@@ -361,7 +361,7 @@ async function main() {
     console.log('Successfully built index.html');
 
   } catch (error) {
-    console.error('\n[Bliss] Build failed. Please see details above.');
+    console.error('\n[Makedown] Build failed. Please see details above.');
     process.exit(1);
   }
 }
