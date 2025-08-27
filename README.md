@@ -1,4 +1,7 @@
-# Makedown <img src="/public/favicon.svg" alt="Logo" width="70" style="vertical-align: middle;">
+<h1>
+  My Project
+  <img src="./assets/logo.png" alt="Logo" width="30" style="vertical-align: middle; margin-left: 8px;">
+</h1>
 
 **A Super Simple Blog Framework in Node.js**
 
