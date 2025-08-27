@@ -11,7 +11,7 @@
     <p>My blog posts:</p>
     <ul>
       <li><a href="/hello-world.html">{{blogcontent.posts[0].title}}</a></li>
-      <p>{{blogcontent.posts[0].meta.test}}</p>
+      [[(blogcontent.posts)<p>{{item.meta.description}}</p><a href="{{item.url}}">link</a>]]
     </ul>
   </div>
 </body>
