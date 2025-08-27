@@ -1,0 +1,12 @@
+<!-- Created with PixiEditor (https://pixieditor.net) -->
+<svg version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <path d="M24.6363 163.498C24.6363 163.498 60.7287 296.551 144.578 256C216.85 221.048 228.442 80.4388 296.512 54.8012C400.916 15.4785 353.838 311.449 296.512 272.145C220.7 220.166 425.258 35.8246 471.24 89.5341C534.562 163.498 420.213 174.109 420.213 387.711" fill-rule="nonzero" transform="matrix(1, 0, 0, 1, 0, 0)" fill="#000000" fill-opacity="0" stroke="url(#linearGradient0)" stroke-width="20" stroke-linecap="round" stroke-linejoin="miter" opacity="1" id="Path" />
+  <path d="M380.176 371.782L436.211 383.33L489.507 371.782L436.211 496.983L380.176 371.782Z" fill-rule="nonzero" transform="matrix(0.9446846, 0, 0, 0.7657026, 8.81039, 91.73489)" fill="#006ef7" fill-opacity="1" stroke="#007cf3" stroke-width="0" stroke-linecap="round" stroke-linejoin="miter" opacity="1" id="Path" />
+  <defs>
+    <linearGradient x1="0" y1="0" x2="1" y2="0.58482177734375" id="linearGradient0">
+      <stop stop-color="#bcff5d" offset="0%" stop-opacity="1" />
+      <stop stop-color="#00ffb1" offset="43.66238286586407%" stop-opacity="1" />
+      <stop stop-color="#0032ff" offset="100%" stop-opacity="1" />
+    </linearGradient>
+  </defs>
+</svg>

@@ -1,0 +1,18 @@
+{
+  "name": "makedown",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build.cjs",
+    "start": "node build.cjs && node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.15.0",
+  "dependencies": {
+    "express": "^5.1.0",
+    "showdown": "^2.1.0"
+  }
+}
