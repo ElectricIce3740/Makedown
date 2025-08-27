@@ -15,6 +15,7 @@
 - [Development](#preview)
 - [Building and Deployment](#building-and-deployment)
 - [Feedback](#feedback)
+- [License](#license)
 
 ## About
 
