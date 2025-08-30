@@ -28,7 +28,7 @@ I have only tried node.js v22, but others should work as well. The only other de
 
 ## Getting Started
 
-1.  **Clone the repository:** In the parent folder where you want your project to be, run
+1.  **Clone the repository:** You need a local copy of this repo on your local machine. You can download the contents manually or use the git clone command. To use git clone, start in the parent folder where you want your project to be, and then run
     ```bash
     git clone https://github.com/ElectricIce3740/Makedown
     ```
