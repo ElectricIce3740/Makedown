@@ -32,6 +32,7 @@ I have only tried node.js v22, but others should work as well. The only other de
     ```bash
     git clone https://github.com/ElectricIce3740/Makedown
     ```
+    If you plan to use a remote repository, be sure to set the remote origin to the url of your repo.
 2.  **Install dependencies:** Navigate to the created directory and run
     ```bash
     npm install
