@@ -1,15 +1,583 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{page.meta.title}}</title>
-    <meta name="description" content="{{page.meta.description}}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{page.meta.title}}</title>
+  <meta name="description" content="{{page.meta.description}}">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <style>
+:root {
+  --indigo: #1a237e;
+  --emerald: #004d40;
+  --bg: #060814;
+}
+
+html,
+body {
+  height: auto;              /* allow page scroll */
+  margin: 0;
+  overflow-x: hidden;        /* no sideways scroll */
+  overflow-y: auto;          /* allow vertical scroll */
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji";
+  background: var(--bg);
+  color: #fff;
+}
+
+/* WebGL canvas covers the viewport */
+#gl-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  outline: none;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--bg);
+}
+
+/* CSS-only fallback */
+#fallback {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  display: none;
+  filter: blur(36px) saturate(110%) brightness(0.72) contrast(110%);
+  transform: translateZ(0);
+  background: var(--bg);
+}
+
+.blob,
+.ink {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+  left: calc(50% - var(--size)/2);
+  top: calc(50% - var(--size)/2);
+  width: var(--size);
+  height: var(--size);
+}
+
+/* (all your blob/ink animation rules remain unchanged) */
+
+/* Center layout */
+.center {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2vmin;
+  gap: 2vmin;
+  overflow: hidden;
+}
+
+.center .glass {
+  width: 100%;
+  max-width: 800px;
+  box-sizing: border-box;
+}
+
+.center .glass:first-child {
+  flex: 0 0 auto;
+}
+
+.center .glass:last-child {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Glass panels */
+.glass {
+  padding: 5vw;  /* responsive padding */
+  position: relative;
+  border-radius: 20px;
+  isolation: isolate;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  line-height: 1.6;
+}
+
+/* Headings inside glass */
+.glass h1,
+.glass h2,
+.glass h3 {
+  margin-top: 0;
+  line-height: 1.2;
+}
+
+.glass p {
+  margin: 0;
+}
+
+/* Links */
+a {
+  color: #fff;
+  text-decoration: none;
+  transition: all;
+}
+
+a:hover {
+  color: #495eff;
+}
+
+/* Typography */
+h1,
+.title {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(1.5rem, 6vw, 3rem);
+  font-weight: 100;
+  margin: 0 0 20px 0;
+}
+
+.title {
+  color: #fff;
+}
+
+a {
+  font-size: clamp(0.9rem, 4vw, 1.2rem);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .glass {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .center {
+    padding: 10px;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .center .glass:first-child div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  #gl-canvas {
+    display: none;
+  }
+
+  #fallback {
+    filter: brightness(0.8) contrast(115%);
+  }
+
+  .blob,
+  .ink {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+  </style>
 </head>
+
 <body>
-    <h1>{{page.meta.title}}</h1>
-    <h2>{{page.meta.description}}</h2>
-    <div>{{page.content}}</div>
+  <!-- WebGL animated background -->
+  <canvas id="gl-canvas" aria-hidden="true"></canvas>
+
+  <!-- CSS-only fallback (enabled when WebGL not available) -->
+  <div id="fallback" aria-hidden="true">
+    <!-- Blue-heavy, minimal purple, tiny emerald -->
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <!-- Dark ink accents -->
+    <div class="ink"></div>
+    <div class="ink"></div>
+    <div class="ink"></div>
+  </div>
+
+  <!-- Centered title -->
+  <div class="center">
+    <div class="glass" style="padding-top: 30px; padding-bottom: 30px;">
+      <div style="display: flex; flex-direction: row; align-items:baseline; justify-content: space-between; gap: 20px;">
+        <a href="/" class="title" style="margin-bottom: 0;">{{title}}</a>
+        <a style="font-size: large;" href="/about.html">about</a>
+      </div>
+    </div>
+    <div class="glass">
+      <h1 style="margin-bottom: 0;">{{page.meta.title}}</h1>
+      <p style="font-size: large; color: #cfd5ff; margin-bottom: 20px;">{{page.meta.date}}</p>
+      {{page.content}}
+    </div>
+  </div>
+
+  <script>
+    /*
+      Liquid Dreams — tweakable controls:
+      Edit SETTINGS below to adjust the look without touching the shader.
+    */
+    const SETTINGS = {
+      // Motion and structure
+      speed: 0.10,   // overall animation speed
+      scale: 1.60,   // swirl density/size (higher = finer swirls)
+
+      // Palette weights
+      blueBoost: 0.60,   // amplifies deep blues (base weights already blue-heavy)
+      emeraldLevel: 3.00,   // 1.0 = as-is; lower to reduce emerald presence
+      purpleLevel: 0.20,   // keep low to minimize purple
+      purpleShift: 0.85,   // 0..1 (1 = fully blue-shifted purple)
+
+      // Shading and inky veins
+      inkStrength: 0.8,   // darkness of black swirls (0..1+)
+      lightMin: 0.20,   // base lighting floor (lower = darker)
+      lightRange: 0.2,   // lighting amplitude (lower = flatter/darker)
+      vignette: 0.20,   // edge darkening strength
+
+      // Final tone
+      blueCast: 0.010,   // subtle overall blue toning (0..1)
+      exposure: 1.00,   // final brightness multiplier
+
+      // Performance
+      maxDPR: 1.5     // cap devicePixelRatio for speed/battery
+    };
+
+    (function () {
+      const canvas = document.getElementById('gl-canvas');
+      const fallback = document.getElementById('fallback');
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) {
+        fallback.style.display = 'block';
+        return;
+      }
+
+      const gl = canvas.getContext('webgl', {
+        alpha: false,
+        antialias: false,
+        depth: false,
+        stencil: false,
+        powerPreference: 'high-performance',
+        preserveDrawingBuffer: false
+      });
+
+      if (!gl) {
+        fallback.style.display = 'block';
+        return;
+      }
+
+      // Vertex shader: full-screen triangle
+      const vertSrc = `
+    attribute vec2 a_position;
+    varying vec2 v_uv;
+    void main(){
+      v_uv = a_position * 0.5 + 0.5;
+      gl_Position = vec4(a_position, 0.0, 1.0);
+    }
+  `;
+
+      // Fragment shader with tweakable uniforms
+      const fragSrc = `
+    precision highp float;
+    uniform vec2  u_resolution;
+    uniform float u_time;
+
+    uniform float u_speed;
+    uniform float u_scale;
+
+    uniform float u_blueBoost;
+    uniform float u_emeraldLevel;
+    uniform float u_purpleLevel;
+    uniform float u_purpleShift;
+
+    uniform float u_inkStrength;
+    uniform float u_lightMin;
+    uniform float u_lightRange;
+    uniform float u_vignette;
+
+    uniform float u_blueCast;
+    uniform float u_exposure;
+
+    varying vec2 v_uv;
+
+    // Hash to pseudo-random scalar
+    float hash12(vec2 p){
+      vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+      p3 += dot(p3, p3.yzx + 33.33);
+      return fract((p3.x + p3.y) * p3.z);
+    }
+
+    // 2D value noise
+    float noise(vec2 p){
+      vec2 i = floor(p);
+      vec2 f = fract(p);
+      float a = hash12(i);
+      float b = hash12(i + vec2(1.0, 0.0));
+      float c = hash12(i + vec2(0.0, 1.0));
+      float d = hash12(i + vec2(1.0, 1.0));
+      vec2 u = f*f*(3.0 - 2.0*f);
+      return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+    }
+
+    // fBm (5 octaves)
+    float fbm(vec2 p){
+      mat2 m = mat2(1.6, -1.2, 1.2, 1.6);
+      float v = 0.0;
+      float a = 0.5;
+      for(int i = 0; i < 5; i++){
+        v += a * noise(p);
+        p = m * p + 0.5;
+        a *= 0.5;
+      }
+      return v;
+    }
+
+    // Ridged fBm for inky veins
+    float ridge(float n){ return 1.0 - abs(2.0*n - 1.0); }
+    float rfbm(vec2 p){
+      mat2 m = mat2(1.8, -1.2, 1.2, 1.8);
+      float v = 0.0;
+      float a = 0.5;
+      for(int i = 0; i < 4; i++){
+        v += a * ridge(noise(p));
+        p = m * p + 0.8;
+        a *= 0.5;
+      }
+      return v;
+    }
+
+    void main(){
+      // Normalize to -0.5..0.5 and correct aspect ratio
+      vec2 uv = v_uv - 0.5;
+      uv.x *= u_resolution.x / u_resolution.y;
+
+      float t = u_time * u_speed;
+
+      // Domain warp for liquid swirl
+      vec2 p = uv * u_scale;
+      vec2 q = vec2(
+        fbm(p + vec2(0.0, 0.0) + t*0.5),
+        fbm(p + vec2(5.2, 1.3) - t*0.4)
+      );
+      vec2 r = p + 1.15*q + 0.3*vec2(cos(t), sin(t));
+
+      // Fields for blending
+      float s1 = fbm(r + 2.0*vec2(cos(t*0.70), sin(t*0.90)));        // deep blue
+      float s2 = fbm(r + 2.2*vec2(cos(t*0.63+2.0), sin(t*0.83+2.0))); // emerald
+      float s3 = fbm(r + 2.4*vec2(cos(t*0.57+4.0), sin(t*0.77+4.0))); // purple (minimized)
+      float s4 = fbm(r*1.25 + vec2(7.3, -2.1) + t*0.15);              // deeper blue A
+      float s5 = fbm(r*1.55 + vec2(-4.2, 3.7) - t*0.12);              // deeper blue B
+
+      // Soft thresholds for broad overlapping blobs
+      s1 = smoothstep(0.30, 0.96, s1);
+      s2 = smoothstep(0.35, 0.96, s2);
+      s3 = smoothstep(0.40, 0.98, s3); // slightly harder so it appears less
+      float dA = smoothstep(0.50, 0.92, s4);
+      float dB = smoothstep(0.52, 0.94, s5);
+
+      // Base weights (blue-heavy), scaled by tweakable uniforms
+      float w1 = 1.55 * u_blueBoost;    // deep blue
+      float w2 = 0.35 * u_emeraldLevel; // emerald
+      float w3 = 0.20 * u_purpleLevel;  // purple
+      float w4 = 1.15 * u_blueBoost;    // deeper blue A
+      float w5 = 1.05 * u_blueBoost;    // deeper blue B
+
+      // Palette: original colors; purple is blue-shifted to avoid magenta cast
+      vec3 c1  = vec3(0.10196, 0.13725, 0.49412); // #1a237e
+      vec3 c2  = vec3(0.00000, 0.30196, 0.25098); // #004d40
+      vec3 c3  = vec3(0.27059, 0.15294, 0.62745); // #4527a0
+      vec3 c3b = mix(c3, c1, clamp(u_purpleShift, 0.0, 1.0)); // blue-shifted purple
+      vec3 c4  = mix(c1, vec3(0.0), 0.65);        // darker cobalt
+      vec3 c5  = vec3(0.0235, 0.0627, 0.2275);    // #06103a (midnight blue)
+
+      float sumw = s1*w1 + s2*w2 + s3*w3 + dA*w4 + dB*w5 + 1e-5;
+      vec3 col = (c1*(s1*w1) + c2*(s2*w2) + c3b*(s3*w3) + c4*(dA*w4) + c5*(dB*w5)) / sumw;
+
+      // Subtle lighting from domain-warped field (kept dark via uniforms)
+      float f = fbm(r);
+      float light = u_lightMin + u_lightRange * smoothstep(0.18, 0.88, f);
+      col *= light;
+
+      // Inky black swirls (ridged-fBm mask)
+      vec2 ss = r * 1.35 + 0.9*vec2(sin(t*0.23), cos(t*0.17));
+      float ink = rfbm(ss);
+      float swirl = pow(smoothstep(0.60, 0.92, ink), 1.35);
+      col = mix(col, vec3(0.0), swirl * u_inkStrength);
+
+      // Vignette for mood
+      float d = length(uv);
+      col *= 1.0 - u_vignette * smoothstep(0.55, 1.15, d);
+
+      // Slight additional blue cast
+      vec3 deepBias = normalize(c1*0.75 + c5*0.25);
+      col = mix(col, deepBias * length(col), u_blueCast);
+
+      // Exposure and gamma correction
+      col = pow(max(col * u_exposure, 0.0), vec3(1.0/2.2));
+
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `;
+
+      function compile(gl, type, src) {
+        const sh = gl.createShader(type);
+        gl.shaderSource(sh, src);
+        gl.compileShader(sh);
+        if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+          const msg = gl.getShaderInfoLog(sh);
+          gl.deleteShader(sh);
+          throw new Error('Shader compile error: ' + msg);
+        }
+        return sh;
+      }
+
+      let program;
+      try {
+        const vs = compile(gl, gl.VERTEX_SHADER, vertSrc);
+        const fs = compile(gl, gl.FRAGMENT_SHADER, fragSrc);
+        program = gl.createProgram();
+        gl.attachShader(program, vs);
+        gl.attachShader(program, fs);
+        gl.linkProgram(program);
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          const msg = gl.getProgramInfoLog(program);
+          gl.deleteProgram(program);
+          throw new Error('Program link error: ' + msg);
+        }
+      } catch (e) {
+        console.warn(e);
+        fallback.style.display = 'block';
+        return;
+      }
+
+      // Full-screen triangle
+      const quad = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1, -1,
+        3, -1,
+        -1, 3
+      ]), gl.STATIC_DRAW);
+
+      gl.useProgram(program);
+      const aPos = gl.getAttribLocation(program, 'a_position');
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+      // Uniform locations
+      const uTime = gl.getUniformLocation(program, 'u_time');
+      const uRes = gl.getUniformLocation(program, 'u_resolution');
+
+      const uSpeed = gl.getUniformLocation(program, 'u_speed');
+      const uScale = gl.getUniformLocation(program, 'u_scale');
+      const uBlueBoost = gl.getUniformLocation(program, 'u_blueBoost');
+      const uEmeraldLevel = gl.getUniformLocation(program, 'u_emeraldLevel');
+      const uPurpleLevel = gl.getUniformLocation(program, 'u_purpleLevel');
+      const uPurpleShift = gl.getUniformLocation(program, 'u_purpleShift');
+      const uInkStrength = gl.getUniformLocation(program, 'u_inkStrength');
+      const uLightMin = gl.getUniformLocation(program, 'u_lightMin');
+      const uLightRange = gl.getUniformLocation(program, 'u_lightRange');
+      const uVignette = gl.getUniformLocation(program, 'u_vignette');
+      const uBlueCast = gl.getUniformLocation(program, 'u_blueCast');
+      const uExposure = gl.getUniformLocation(program, 'u_exposure');
+
+      // Set tweakable uniforms (called once; edit SETTINGS to change)
+      function applySettings() {
+        gl.uniform1f(uSpeed, SETTINGS.speed);
+        gl.uniform1f(uScale, SETTINGS.scale);
+        gl.uniform1f(uBlueBoost, SETTINGS.blueBoost);
+        gl.uniform1f(uEmeraldLevel, SETTINGS.emeraldLevel);
+        gl.uniform1f(uPurpleLevel, SETTINGS.purpleLevel);
+        gl.uniform1f(uPurpleShift, SETTINGS.purpleShift);
+        gl.uniform1f(uInkStrength, SETTINGS.inkStrength);
+        gl.uniform1f(uLightMin, SETTINGS.lightMin);
+        gl.uniform1f(uLightRange, SETTINGS.lightRange);
+        gl.uniform1f(uVignette, SETTINGS.vignette);
+        gl.uniform1f(uBlueCast, SETTINGS.blueCast);
+        gl.uniform1f(uExposure, SETTINGS.exposure);
+      }
+
+      // Dynamic resolution scaling for smoothness and battery life
+      const deviceDPR = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+      let targetDPR = Math.min(deviceDPR, SETTINGS.maxDPR);
+      const MIN_DPR = 0.6;
+      const MAX_DPR = Math.max(1.0, Math.min(deviceDPR, SETTINGS.maxDPR));
+
+      function resize() {
+        const w = Math.floor(window.innerWidth * targetDPR);
+        const h = Math.floor(window.innerHeight * targetDPR);
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+          gl.viewport(0, 0, w, h);
+        }
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+      }
+
+      let rafId = 0;
+      let start = performance.now();
+      let lastFpsCheck = start;
+      let frames = 0;
+
+      function loop(now) {
+        rafId = requestAnimationFrame(loop);
+        frames++;
+        // Sample FPS every ~1s and adapt resolution
+        if (now - lastFpsCheck > 1000) {
+          const fps = (frames * 1000) / (now - lastFpsCheck);
+          if (fps < 48 && targetDPR > MIN_DPR) {
+            targetDPR = Math.max(MIN_DPR, targetDPR - 0.1);
+            resize();
+          } else if (fps > 58 && targetDPR < MAX_DPR) {
+            targetDPR = Math.min(MAX_DPR, targetDPR + 0.05);
+            resize();
+          }
+          frames = 0;
+          lastFpsCheck = now;
+        }
+
+        const t = (now - start) / 1000;
+        gl.uniform1f(uTime, t);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      }
+
+      function onResize() { resize(); }
+      function onVis() {
+        if (document.hidden) cancelAnimationFrame(rafId);
+        else {
+          lastFpsCheck = performance.now();
+          frames = 0;
+          rafId = requestAnimationFrame(loop);
+        }
+      }
+
+      // Kick off
+      applySettings();
+      resize();
+      fallback.style.display = 'none';
+      rafId = requestAnimationFrame(loop);
+
+      window.addEventListener('resize', onResize, { passive: true });
+      document.addEventListener('visibilitychange', onVis, { passive: true });
+    })();
+  </script>
 </body>
+
 </html>
